@@ -368,14 +368,10 @@ def _dedupe_citing_works(citing_works: list[CitingWork]) -> list[CitingWork]:
 def classify_articles(author: Author, articles: list[Article]) -> list[Article]:
     """Dedupe each article's citing works and count them as Type A / Type B / self.
 
-    The co-author set is the union across *all* of the author's articles: a citing
-    document counts as Type B if any co-author from any of their papers appears on
-    it, not just a co-author of the article being cited.
+    Each citing work is compared with the authors of the article it cites
+    (Article.coauthor_ids), as Rizoma defines Type B: someone who co-wrote a
+    different paper with the researcher does not make a citation Type B.
     """
-    all_coauthor_ids: set[str] = set()
-    for art in articles:
-        all_coauthor_ids.update(art.coauthor_ids)
-
     updated: list[Article] = []
     for art in articles:
         if not art.citing_works:
@@ -384,9 +380,10 @@ def classify_articles(author: Author, articles: list[Article]) -> list[Article]:
 
         deduped = _dedupe_citing_works(art.citing_works)
 
+        cited_coauthor_ids = set(art.coauthor_ids)
         type_a = type_b = self_c = 0
         for cw in deduped:
-            t = classify_citation_type(cw, author.openalex_id, all_coauthor_ids)
+            t = classify_citation_type(cw, author.openalex_id, cited_coauthor_ids)
             if t == "A":
                 type_a += 1
             elif t == "B":

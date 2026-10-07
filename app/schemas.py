@@ -65,6 +65,8 @@ class Article(BaseModel):
     cites_type_a: int = 0
     cites_type_b: int = 0
     cites_self: int = 0
+    # OpenAlex author ids of *this* work, minus the researcher. Type B is decided
+    # against these alone. Empty for records from other sources.
     coauthor_ids: list[str] = []
 
 

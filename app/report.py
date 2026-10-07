@@ -36,12 +36,11 @@ _REPORT_STRINGS = {
         ),
         "def_header": "DEFINICIÓN OFICIAL DE CITAS (plataforma Rizoma, SECIHTI):",
         "def_a": (
-            "  - Tipo A: citas realizadas por autores externos; ni el investigador ni ninguno de sus "
-            "coautores participa en el documento citante."
+            "  - Tipo A: ninguno de los autores del documento citante es autor del trabajo citado."
         ),
         "def_b": (
-            "  - Tipo B: citas realizadas en documentos donde participa algún coautor del investigador, "
-            "pero en los cuales el investigador mismo no es autor."
+            "  - Tipo B: entre los autores del documento citante hay uno o varios autores del trabajo "
+            "citado, pero no el investigador evaluado."
         ),
         "def_self": (
             "  - Autocitas: documentos citantes donde el propio investigador figura como autor; "
@@ -70,12 +69,11 @@ _REPORT_STRINGS = {
         ),
         "def_header": "OFFICIAL CITATION DEFINITION (Rizoma platform, SECIHTI):",
         "def_a": (
-            "  - Type A: citations by external authors; neither the researcher nor any of their "
-            "co-authors is an author of the citing document."
+            "  - Type A: none of the authors of the citing document is an author of the cited work."
         ),
         "def_b": (
-            "  - Type B: citations in documents where a co-author of the researcher participates, "
-            "but the researcher themselves is not an author."
+            "  - Type B: one or more authors of the cited work are among the authors of the citing "
+            "document, but the researcher being evaluated is not."
         ),
         "def_self": (
             "  - Self-citations: citing documents where the researcher themselves appears as an author; "

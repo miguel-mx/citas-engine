@@ -74,6 +74,59 @@ def test_classify_articles_dedupes_and_counts():
     assert (art.cites_type_a, art.cites_type_b, art.cites_self) == (1, 1, 1)
 
 
+
+def _classify_two_articles(citing: CitingWork) -> tuple[Article, Article]:
+    """Researcher A1 wrote W1 with X (A2) and W2 with Y (A3); `citing` cites both."""
+    author = Author(openalex_id="A1", display_name="Test", works_count=2)
+    w1 = Article(title="one", openalex_id="W1", coauthor_ids=["A2"], citing_works=[citing])
+    w2 = Article(title="two", openalex_id="W2", coauthor_ids=["A3"], citing_works=[citing])
+    return tuple(classify_articles(author, [w1, w2]))
+
+
+def _counts(art: Article) -> tuple[int, int, int]:
+    return art.cites_type_a, art.cites_type_b, art.cites_self
+
+
+def test_coauthor_of_another_article_is_type_a():
+    """Rizoma compares against the authors of the cited work only: X co-wrote W1
+    but not W2, so X citing W2 without the researcher is Type A there."""
+    w1, w2 = _classify_two_articles(CitingWork(title="by X", author_ids=["A2", "A9"]))
+
+    assert _counts(w1) == (0, 1, 0)
+    assert _counts(w2) == (1, 0, 0)
+
+
+def test_coauthor_of_the_cited_article_is_type_b():
+    w1, w2 = _classify_two_articles(CitingWork(title="by Y", author_ids=["A3"]))
+
+    assert _counts(w1) == (1, 0, 0)
+    assert _counts(w2) == (0, 1, 0)
+
+
+def test_researcher_on_the_citing_work_is_self_even_with_coauthors():
+    w1, w2 = _classify_two_articles(
+        CitingWork(title="by everyone", author_ids=["A2", "A1", "A3"])
+    )
+
+    assert _counts(w1) == (0, 0, 1)
+    assert _counts(w2) == (0, 0, 1)
+
+
+def test_cited_article_without_author_ids_is_type_a():
+    """A record from a source other than OpenAlex carries no author ids, so no
+    overlap can be shown: Type A, even for someone who co-wrote another paper."""
+    author = Author(openalex_id="A1", display_name="Test", works_count=2)
+    with_ids = Article(title="openalex", openalex_id="W1", coauthor_ids=["A2"])
+    without_ids = Article(
+        title="scopus only",
+        doi="10.1/s",
+        citing_works=[CitingWork(title="by X", doi="10.1/c", author_ids=["A2"])],
+    )
+
+    _, art = classify_articles(author, [with_ids, without_ids])
+
+    assert _counts(art) == (1, 0, 0)
+
 def test_validate_counts_flags_shortfall_against_openalex():
     articles = [Article(title="under-retrieved", openalex_cited_by_count=100,
                         citing_works=[], cites_type_a=0)]
