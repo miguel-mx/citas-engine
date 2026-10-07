@@ -23,7 +23,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
-from app.classify import classify_citation_type
+from app.classify import CLASSIFICATION_RULE, classify_citation_type
 from app.config import settings
 from app.merge import merge_articles, merge_citing_works
 from app import progress
@@ -476,6 +476,7 @@ def run_analysis(
         articles=articles,
         flags=flags,
         notes=notes,
+        classification_rule=CLASSIFICATION_RULE,
     )
 
     if want_report:

@@ -9,6 +9,11 @@ from __future__ import annotations
 
 from app.schemas import CitingWork
 
+# Which rule produced a result's A/B/self figures, stamped on every AnalysisResult.
+# Figures from different rules must not be compared, so change this whenever the
+# rule changes. Results from before it existed carry no value at all.
+CLASSIFICATION_RULE = "rizoma-por-articulo"
+
 
 def classify_citation_type(
     cw: CitingWork,

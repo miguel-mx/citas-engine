@@ -84,3 +84,9 @@ class AnalysisResult(BaseModel):
     # unconfigured source was skipped. Recorded so a partial run is never read as a
     # complete one, but never a reason to flag the run.
     notes: list[str] = []
+
+    # The classify.CLASSIFICATION_RULE the A/B/self figures were computed under. None
+    # on results from before the field existed — those used the earlier rule (Type B
+    # against co-authors of *any* of the researcher's works), so a stored snapshot
+    # sent back to /report keeps saying so instead of passing for current.
+    classification_rule: Optional[str] = None

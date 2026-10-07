@@ -324,3 +324,27 @@ def test_preprint_note_counts_by_repository():
 
 def test_preprint_note_is_silent_when_there_are_none():
     assert _preprint_note([Article(title="a", work_type="article")]) == []
+
+
+def test_a_result_records_the_classification_rule(monkeypatch):
+    """Every fresh result says which rule produced its A/B/self figures, so a
+    caller can refuse to compare it with figures from another rule."""
+    from app import pipeline
+    from app.classify import CLASSIFICATION_RULE
+
+    author = Author(openalex_id="A1", display_name="Test", works_count=0)
+    monkeypatch.setattr(pipeline, "fetch_works", lambda *a, **k: ([], [], []))
+    monkeypatch.setattr(pipeline, "fetch_citing_works", lambda articles, **k: articles)
+
+    result, _ = pipeline.run_analysis(author)
+
+    assert result.classification_rule == CLASSIFICATION_RULE
+
+
+def test_a_stored_snapshot_without_the_rule_is_not_read_as_current():
+    """Snapshots stored before the field existed come back through /report; they
+    were computed under the earlier rule and must not pass for current ones."""
+    old = {"author": {"openalex_id": "A1", "display_name": "T", "works_count": 0},
+           "run_timestamp": "20260729T000000Z"}
+
+    assert AnalysisResult.model_validate(old).classification_rule is None
